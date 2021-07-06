@@ -14,6 +14,7 @@ from .osnet import *
 import copy
 import random
 import math
+from .bnneck import BNNeck, BNNeck3
 
 
 class POSNet(nn.Module):
@@ -65,6 +66,8 @@ class POSNet(nn.Module):
         if self.classifier2.bias is not None:
             nn.init.constant_(self.classifier2.bias, 0)
 
+        self.bnneck1 = BNNeck3(2048, num_classes, 2048, return_f=True)
+        self.bnneck2 = BNNeck3(512, num_classes, fc_dims, return_f=True)
 
     def featuremaps(self, x):
         x = self.layer0(x)
@@ -89,29 +92,37 @@ class POSNet(nn.Module):
         v13 = self.global_avgpool(f13)
         v14 = self.global_avgpool(f14)
         v2 = self.global_maxpool(f2)
-       
-        v11 = v11.view(v11.size(0), -1)
-        v12 = v12.view(v12.size(0), -1)
-        v13 = v13.view(v13.size(0), -1)
-        v14 = v14.view(v14.size(0), -1)
         v1 = torch.cat([v11, v12, v13, v14], 1)
-        v2 = v2.view(v2.size(0), -1)
 
-        v2 = self.fc2(v2)
+        # print("hi: v2:", v2.size())
+        # v11 = v11.view(v11.size(0), -1)
+        # v12 = v12.view(v12.size(0), -1)
+        # v13 = v13.view(v13.size(0), -1)
+        # v14 = v14.view(v14.size(0), -1)
+        # v1 = torch.cat([v11, v12, v13, v14], 1)
+        # v2 = v2.view(v2.size(0), -1)
+        # print("hi: v2:", v2.size())
+        # v2 = self.fc2(v2)
 
-        fea = [v1, v2]
-       
-        v1 = self.bn1(v1)
-        v2 = self.bn2(v2)
-        
+        # fea = [v1, v2]
+        fv1 = self.bnneck1(v1)
+        fv2 = self.bnneck2(v2)
+        fea = [fv1[-1], fv2[-1]]
+
+        # v1 = self.bn1(v1)
+        # v2 = self.bn2(v2)
+
         if not self.training:
-           v1 = F.normalize(v1, p=2, dim=1)
-           v2 = F.normalize(v2, p=2, dim=1)
-           return torch.cat([v1, v2], 1)
-   
-        y1 = self.classifier1(v1)
-        y2 = self.classifier2(v2)
- 
+           # v1 = F.normalize(v1, p=2, dim=1)
+           # v2 = F.normalize(v2, p=2, dim=1)
+           # return torch.cat([v1, v2], 1)
+            return torch.cat([fv1[0], fv2[0]], 1)
+
+        # y1 = self.classifier1(v1)
+        # y2 = self.classifier2(v2)
+        y1 = fv1[1]
+        y2 = fv2[1]
+
         if self.loss == 'softmax':
             return y1, y2
         elif self.loss == 'triplet':
