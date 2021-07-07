@@ -107,7 +107,8 @@ class POSNet(nn.Module):
         if not self.training:
            v1 = F.normalize(v1, p=2, dim=1)
            v2 = F.normalize(v2, p=2, dim=1)
-           return torch.cat([v1, v2], 1)
+           # return torch.cat([v1, v2], 1)
+           return v1
    
         y1 = self.classifier1(v1)
         y2 = self.classifier2(v2)
