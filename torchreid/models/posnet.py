@@ -14,6 +14,7 @@ from .osnet import *
 import copy
 import random
 import math
+from .attention_module import Attention_Module
 from .bnneck import BNNeck, BNNeck3
 
 
@@ -21,35 +22,37 @@ class POSNet(nn.Module):
 
     def __init__(self, num_classes, fc_dims=None, loss=None,  pretrained=True, **kwargs):
         super(POSNet, self).__init__()
-        
+
         osnet = osnet_x1_0(pretrained=pretrained)
-        
+
         self.loss = loss
-        
+
         self.layer0 = nn.Sequential(
             osnet.conv1,
             osnet.maxpool
             )
         self.layer1 = osnet.conv2
+        self.attention_module1 = Attention_Module(256)
         self.layer2 = osnet.conv3
+        self.attention_module2 = Attention_Module(384)
         self.layer30 = osnet.conv4
         self.layer31 = nn.Sequential(copy.deepcopy(self.layer30))
-      
-        self.layer40 = osnet.conv5 
-        self.layer41 = nn.Sequential(copy.deepcopy(self.layer40))        
+
+        self.layer40 = osnet.conv5
+        self.layer41 = nn.Sequential(copy.deepcopy(self.layer40))
 
 
         self.global_avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.global_maxpool = nn.AdaptiveMaxPool2d((1, 1))
-        
+
         self.fc2 = nn.Linear(fc_dims, 512)
- 
+
         self.bn1 = nn.BatchNorm1d(2048)
         self.bn2 = nn.BatchNorm1d(512)
 
         self.classifier1 = nn.Linear(2048, num_classes)
         self.classifier2 = nn.Linear(512, num_classes)
-              
+
         nn.init.constant_(self.bn1.weight, 1.0)
         nn.init.constant_(self.bn1.bias, 0.0)
         nn.init.constant_(self.bn2.weight, 1.0)
@@ -72,7 +75,9 @@ class POSNet(nn.Module):
     def featuremaps(self, x):
         x = self.layer0(x)
         x = self.layer1(x)
+        x = self.attention_module1(x)
         x = self.layer2(x)
+        x = self.attention_module2(x)
         x1 = self.layer30(x)
         x2 = self.layer31(x)
         x1 = self.layer40(x1)
@@ -86,7 +91,7 @@ class POSNet(nn.Module):
         f12 = f1[:, :, H//4:H//2, :]
         f13 = f1[:, :, H//2:(3*H//4), :]
         f14 = f1[:, :, (3*H//4):, :]
-        
+
         v11 = self.global_avgpool(f11)
         v12 = self.global_avgpool(f12)
         v13 = self.global_avgpool(f13)
