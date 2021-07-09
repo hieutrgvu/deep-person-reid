@@ -98,7 +98,8 @@ class POSNet(nn.Module):
         v1 = v11
         v2 = v2.view(v2.size(0), -1)
 
-        v2 = self.fc2(v2)
+        v1 = self.fc2(v1)
+        # v2 = self.fc2(v2)
 
         fea = [v1, v2]
        
