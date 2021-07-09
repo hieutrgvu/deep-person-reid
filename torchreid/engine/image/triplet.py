@@ -114,17 +114,27 @@ class ImageTripletEngine(engine.Engine):
             output1, output2, fea = self.model(imgs)
             loss_c1 = self._compute_loss(self.criterion_c1, fea[0], pids)
             loss_c2 = self._compute_loss(self.criterion_c2, fea[1], pids)
+            print("loss_c1:", loss_c1)
+            print("loss_c2:", loss_c2)
  
             loss_t1 = self._compute_loss(self.criterion_t, fea[0], pids)
             loss_t2 = self._compute_loss(self.criterion_t, fea[1], pids)
+            print("loss_t1:", loss_t1)
+            print("loss_t2:", loss_t2)
 
             loss_x1 = self._compute_loss(self.criterion_x, output1, pids)
             loss_x2 = self._compute_loss(self.criterion_x, output2, pids)
+            print("loss_x1:", loss_x1)
+            print("loss_x2:", loss_x2)
  
             loss1 = (self.weight_x * loss_x1 + self.weight_x * loss_x2) * 0.5
             loss2 = (self.weight_t * loss_t1 + self.weight_t * loss_t2) * 0.5
             loss3 = (loss_c1 + loss_c2) * 0.5
+            print("loss1:", loss1)
+            print("loss2:", loss2)
+            print("loss3:", loss2)
             loss = loss1 + loss2 + 0.0005 * loss3
+            print("loss:", loss)
             loss.backward()
             self.optimizer.step()
 
