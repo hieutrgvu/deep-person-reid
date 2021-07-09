@@ -43,10 +43,10 @@ class POSNet(nn.Module):
         
         self.fc2 = nn.Linear(fc_dims, 512)
  
-        self.bn1 = nn.BatchNorm1d(1024)
+        self.bn1 = nn.BatchNorm1d(3072)
         self.bn2 = nn.BatchNorm1d(512)
 
-        self.classifier1 = nn.Linear(1024, num_classes)
+        self.classifier1 = nn.Linear(3072, num_classes)
         self.classifier2 = nn.Linear(512, num_classes)
               
         nn.init.constant_(self.bn1.weight, 1.0)
@@ -79,24 +79,28 @@ class POSNet(nn.Module):
     def forward(self, x):
         f1, f2 = self.featuremaps(x)
         B, C, H, W = f1.size()
-        f11 = f1[:, :, :H//2, :]
-        f12 = f1[:, :, H//2:, :]
-        # f11 = f1[:, :, :H//4, :]
-        # f12 = f1[:, :, H//4:H//2, :]
-        # f13 = f1[:, :, H//2:(3*H//4), :]
-        # f14 = f1[:, :, (3*H//4):, :]
+        f11 = f1[:, :, :H//6, :]
+        f12 = f1[:, :, H//6:(2*H//6), :]
+        f13 = f1[:, :, (2*H//6):(3*H//6), :]
+        f14 = f1[:, :, (3*H//6):(4*H//6), :]
+        f15 = f1[:, :, (4*H//6):(5*H//6), :]
+        f16 = f1[:, :, (5*H//6):, :]
         
         v11 = self.global_avgpool(f11)
         v12 = self.global_avgpool(f12)
-        # v13 = self.global_avgpool(f13)
-        # v14 = self.global_avgpool(f14)
+        v13 = self.global_avgpool(f13)
+        v14 = self.global_avgpool(f14)
+        v13 = self.global_avgpool(f15)
+        v14 = self.global_avgpool(f16)
         v2 = self.global_maxpool(f2)
        
         v11 = v11.view(v11.size(0), -1)
         v12 = v12.view(v12.size(0), -1)
-        # v13 = v13.view(v13.size(0), -1)
-        # v14 = v14.view(v14.size(0), -1)
-        v1 = torch.cat([v11, v12], 1)
+        v13 = v13.view(v13.size(0), -1)
+        v14 = v14.view(v14.size(0), -1)
+        v15 = v13.view(v13.size(0), -1)
+        v16 = v14.view(v14.size(0), -1)
+        v1 = torch.cat([v11, v12, v13, v14, v15, v16], 1)
         v2 = v2.view(v2.size(0), -1)
 
         v2 = self.fc2(v2)
