@@ -82,7 +82,7 @@ class ImageTripletEngine(engine.Engine):
             use_gpu=self.use_gpu,
             label_smooth=label_smooth
         )
-        self.criterion_c1 = CenterLoss(num_classes=751, feat_dim=2048)
+        self.criterion_c1 = CenterLoss(num_classes=751, feat_dim=1024)
         self.criterion_c2 = CenterLoss(num_classes=751, feat_dim=512)
 
 
