@@ -82,7 +82,8 @@ class ImageTripletEngine(engine.Engine):
             use_gpu=self.use_gpu,
             label_smooth=label_smooth
         )
-        self.criterion_c1 = CenterLoss(num_classes=751, feat_dim=1024)
+        self.criterion_c0 = CenterLoss(num_classes=751, feat_dim=2560)
+        self.criterion_c1 = CenterLoss(num_classes=751, feat_dim=2048)
         self.criterion_c2 = CenterLoss(num_classes=751, feat_dim=512)
 
 
@@ -112,18 +113,20 @@ class ImageTripletEngine(engine.Engine):
             
             self.optimizer.zero_grad()
             output1, output2, fea = self.model(imgs)
-            loss_c1 = self._compute_loss(self.criterion_c1, fea[0], pids)
-            loss_c2 = self._compute_loss(self.criterion_c2, fea[1], pids)
- 
-            loss_t1 = self._compute_loss(self.criterion_t, fea[0], pids)
-            loss_t2 = self._compute_loss(self.criterion_t, fea[1], pids)
+            loss_c0 = self._compute_loss(self.criterion_c0, fea, pids)
+            # loss_c1 = self._compute_loss(self.criterion_c1, fea[0], pids)
+            # loss_c2 = self._compute_loss(self.criterion_c2, fea[1], pids)
+
+            loss_t0 = self._compute_loss(self.criterion_t, fea, pids)
+            # loss_t1 = self._compute_loss(self.criterion_t, fea[0], pids)
+            # loss_t2 = self._compute_loss(self.criterion_t, fea[1], pids)
 
             loss_x1 = self._compute_loss(self.criterion_x, output1, pids)
-            loss_x2 = self._compute_loss(self.criterion_x, output2, pids)
+            # loss_x2 = self._compute_loss(self.criterion_x, output2, pids)
  
-            loss1 = (self.weight_x * loss_x1 + self.weight_x * loss_x2) * 0.5
-            loss2 = (self.weight_t * loss_t1 + self.weight_t * loss_t2) * 0.5
-            loss3 = (loss_c1 + loss_c2) * 0.5
+            loss1 = loss_x1 # (self.weight_x * loss_x1 + self.weight_x * loss_x2) * 0.5
+            loss2 = loss_t0 # (self.weight_t * loss_t1 + self.weight_t * loss_t2) * 0.5
+            loss3 = loss_c0 # (loss_c1 + loss_c2) * 0.5
             loss = loss1 + loss2 + 0.0005 * loss3
             loss.backward()
             self.optimizer.step()
