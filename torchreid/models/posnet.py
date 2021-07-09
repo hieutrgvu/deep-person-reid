@@ -43,10 +43,10 @@ class POSNet(nn.Module):
         
         self.fc2 = nn.Linear(fc_dims, 512)
  
-        self.bn1 = nn.BatchNorm1d(2048)
+        self.bn1 = nn.BatchNorm1d(1024)
         self.bn2 = nn.BatchNorm1d(512)
 
-        self.classifier1 = nn.Linear(2048, num_classes)
+        self.classifier1 = nn.Linear(1024, num_classes)
         self.classifier2 = nn.Linear(512, num_classes)
               
         nn.init.constant_(self.bn1.weight, 1.0)
