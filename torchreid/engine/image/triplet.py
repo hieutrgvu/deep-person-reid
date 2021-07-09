@@ -132,7 +132,7 @@ class ImageTripletEngine(engine.Engine):
             loss3 = (loss_c1 + loss_c2) * 0.5
             print("loss1:", loss1)
             print("loss2:", loss2)
-            print("loss3:", loss2)
+            print("loss3:", loss3)
             loss = loss1 + loss2 + 0.0005 * loss3
             print("loss:", loss)
             loss.backward()
