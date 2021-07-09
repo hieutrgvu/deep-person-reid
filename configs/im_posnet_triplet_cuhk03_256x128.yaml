@@ -9,7 +9,7 @@ data:
   height: 256
   width: 128
   combineall: False
-  transforms: ['random_flip']
+  transforms: ['random_flip', 'color_jitter', 'random_crop']
   save_dir: 'log'
 
 loss:
