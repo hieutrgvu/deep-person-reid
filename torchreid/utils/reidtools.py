@@ -92,11 +92,11 @@ def visualize_ranked_results(distmat, dataset, data_type, width=128, height=256,
             _cp_img_to(qimg_path, qdir, rank=0, prefix='query')
 
         rank_idx = 1
+        all_matched = False
         for g_idx in indices[q_idx,:]:
             gimg_path, gpid, gcamid = gallery[g_idx]
             invalid = (qpid == gpid) & (qcamid == gcamid)
 
-            all_matched = False
             if not invalid:
                 matched = gpid==qpid
                 all_matched = all_matched or matched
@@ -115,7 +115,8 @@ def visualize_ranked_results(distmat, dataset, data_type, width=128, height=256,
                 rank_idx += 1
                 if rank_idx > topk:
                     break
-
+            else:
+                print("oops")
         if data_type == 'image':
             imname = osp.basename(osp.splitext(qimg_path_name)[0])
             print(imname+',', all_matched)
