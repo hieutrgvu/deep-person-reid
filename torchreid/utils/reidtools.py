@@ -118,7 +118,7 @@ def visualize_ranked_results(distmat, dataset, data_type, width=128, height=256,
 
         if data_type == 'image':
             imname = osp.basename(osp.splitext(qimg_path_name)[0])
-            print(imname+','+all_matched)
+            print(imname+',', all_matched)
             cv2.imwrite(osp.join(save_dir, imname+'.jpg'), grid_img)
 
         # if (q_idx+1) % 100 == 0:
