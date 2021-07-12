@@ -96,10 +96,10 @@ def visualize_ranked_results(distmat, dataset, data_type, width=128, height=256,
             gimg_path, gpid, gcamid = gallery[g_idx]
             invalid = (qpid == gpid) & (qcamid == gcamid)
 
-            all_matched = True
+            all_matched = False
             if not invalid:
                 matched = gpid==qpid
-                all_matched = all_matched and matched
+                all_matched = all_matched or matched
                 if data_type == 'image':
                     border_color = GREEN if matched else RED
                     gimg = cv2.imread(gimg_path)
