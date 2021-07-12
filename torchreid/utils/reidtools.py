@@ -95,9 +95,11 @@ def visualize_ranked_results(distmat, dataset, data_type, width=128, height=256,
         for g_idx in indices[q_idx,:]:
             gimg_path, gpid, gcamid = gallery[g_idx]
             invalid = (qpid == gpid) & (qcamid == gcamid)
-            
+
+            all_matched = True
             if not invalid:
                 matched = gpid==qpid
+                all_matched = all_matched and matched
                 if data_type == 'image':
                     border_color = GREEN if matched else RED
                     gimg = cv2.imread(gimg_path)
@@ -116,6 +118,7 @@ def visualize_ranked_results(distmat, dataset, data_type, width=128, height=256,
 
         if data_type == 'image':
             imname = osp.basename(osp.splitext(qimg_path_name)[0])
+            print(imname, all_matched)
             cv2.imwrite(osp.join(save_dir, imname+'.jpg'), grid_img)
 
         if (q_idx+1) % 100 == 0:
