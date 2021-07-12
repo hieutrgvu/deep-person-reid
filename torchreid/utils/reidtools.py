@@ -115,8 +115,6 @@ def visualize_ranked_results(distmat, dataset, data_type, width=128, height=256,
                 rank_idx += 1
                 if rank_idx > topk:
                     break
-            else:
-                print("oops")
         if data_type == 'image':
             imname = osp.basename(osp.splitext(qimg_path_name)[0])
             print(imname+',', all_matched)
