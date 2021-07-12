@@ -76,8 +76,11 @@ class POSNet(nn.Module):
         x2 = self.layer41(x2)
         return x1, x2
 
-    def forward(self, x):
+    def forward(self, x, return_featuremaps=False):
         f1, f2 = self.featuremaps(x)
+        if return_featuremaps:
+            return f1
+
         B, C, H, W = f1.size()
         f11 = f1[:, :, :H//4, :]
         f12 = f1[:, :, H//4:H//2, :]
