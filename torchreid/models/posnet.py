@@ -93,7 +93,8 @@ class POSNet(nn.Module):
         v13 = self.global_avgpool(f13)
         v14 = self.global_avgpool(f14)
         v2 = self.global_maxpool(f2)
-       
+
+       # concat
         v11 = v11.view(v11.size(0), -1)
         v12 = v12.view(v12.size(0), -1)
         v13 = v13.view(v13.size(0), -1)
