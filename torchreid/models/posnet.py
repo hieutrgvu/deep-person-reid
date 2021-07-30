@@ -86,7 +86,8 @@ class POSNet(nn.Module):
         f12 = f1[:, :, H//4:H//2, :]
         f13 = f1[:, :, H//2:(3*H//4), :]
         f14 = f1[:, :, (3*H//4):, :]
-        
+
+        # share
         v11 = self.global_avgpool(f11)
         v12 = self.global_avgpool(f12)
         v13 = self.global_avgpool(f13)
